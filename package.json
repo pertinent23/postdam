@@ -1,5 +1,5 @@
 {
-  "name": "nodemind",
+  "name": "postdam",
   "version": "1.0.0",
   "description": "a javascript framwork to build node js server app",
   "main": "src/minder.ts",

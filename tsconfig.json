@@ -9,6 +9,7 @@
     "outDir": "./dist",                             
     "rootDir": "./src",  
     "moduleResolution": "node",
+    "strictNullChecks": true    
   },
   "exclude":[
     "./node_modules"

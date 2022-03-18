@@ -2,10 +2,13 @@ import shell from 'shelljs';
 import path from 'path';
 import PostDir from '../../bin/PostDir';
 import PostFile from '../../bin/PostFile';
+import PostEnv from '../PostEnv';
 
 export type PostNewOptions = {
     views: boolean,
-    entry: string
+    entry: string,
+    validators: boolean,
+    name?: string
 };
 
 export const postPackages = [
@@ -26,9 +29,8 @@ export function postCreateFolder( name: string ) : void {
 export function postInstallPackages( dirname: string, views: boolean ) : void {
     const 
         list = views ? postPackages.concat( postViewsPackages ) : postPackages;
-    shell.cd( dirname );
-    shell.exec( `npm install ${ list.join( ' ' ) } --save` );
-}
+    shell.exec( `npm --prefix ${dirname} install ${ list.join( ' ' ) } --save` );
+};
 
 export default async function postNewApp( name: string = 'postdam', options: PostNewOptions ) {
     if( !PostDir.isValidAppName( name ) ) {
@@ -60,11 +62,90 @@ export default async function postNewApp( name: string = 'postdam', options: Pos
         }
     }
 
-    postInstallPackages( name, options.views );
-    postBuildFolders( dir, options );
+    postBuildFolders( dir, {
+        ...options,
+        name
+    } );
+    postInstallPackages( dir.getPath(), options.views );
 };
 
-export function postBuildViews( base: PostDir ) {
+export function postBuildConfigs( base: string, options: PostNewOptions ) : void{
+    const 
+        env = new PostEnv( base ),
+        packageJSON = new PostFile( `${ base }/package.json` ),
+        gitignore = new PostFile( `${ base }/.gitignore` ),
+        typescriptJSON = new PostFile( `${ base }/tsconfig.json` );
+    env.getConfigFile().write( {
+        name: options.name,
+        path: base,
+        engine: 'pug',
+        version: '1.0.0',
+        options: {
+            entry: options.entry,
+            views: options.views,
+            validators: options.validators
+        }
+    } );
+
+    typescriptJSON.write( {
+        compilerOptions: {
+          target: "es2016", 
+          module: "commonjs",  
+          esModuleInterop: true,
+          forceConsistentCasingInFileNames: true,
+          strict: true,
+          skipLibCheck: true,
+          outDir: "./dist",                             
+          rootDir: "./src",  
+          moduleResolution: "node",
+          strictNullChecks: true    
+        },
+        exclude:[
+          "./node_modules",
+          "./dist"
+        ]
+    } );
+
+    packageJSON.write( {
+        name: options.name,
+        version: "1.0.0",
+        description: "getting started with postdam",
+        main: `dist/${ options.entry }.js`,
+        author: "",
+        scripts: {
+          start: "pm build",
+          test: "pm serve",
+        }
+    } );
+
+    gitignore.write( `node_modules\ndist` );
+};
+
+export function postBuildViews( base: PostDir ) : void {
+    if ( !base.exist() ) {
+        base.mkdir();
+    }
+};
+
+export function postBuildValidators( base: PostDir ) : void {
+    if ( !base.exist() ) {
+        base.mkdir();
+    }
+};
+
+export function postBuildGuards( base: PostDir ) : void {
+    base.mkdir();
+};
+
+export function postBuildBin( base: PostDir ) : void {
+    base.mkdir();
+};
+
+export function postBuildMiddleWares( base: PostDir ) : void {
+    base.mkdir();
+};
+
+export function postBuildRoutes( base: PostDir ) : void {
     base.mkdir();
 };
 
@@ -72,15 +153,26 @@ export function postBuildFolders( base: PostDir, options: PostNewOptions ) : voi
     base.navigate( 'static' ).mkdir();
     let services;
     const 
+        entry = new PostFile( './../../models/entry.mdl' ),
         src =
             base
                 .navigate( 'src' ).mkdir();
-            src.navigate( 'middlewares' ).mkdir();
-            src.navigate( 'routes' ).mkdir();
+            postBuildMiddleWares( src.navigate( 'middlewares' ) );
+            postBuildRoutes( src.navigate( 'routes' ) );
             services = src.navigate( 'services' ).mkdir();
-                services.navigate( 'guards' ).mkdir();
-                services.navigate( 'validators' ).mkdir();
-    if ( options.views ) {
-        postBuildViews( services.navigate( 'view' ) );
+    postBuildGuards( services.navigate( 'guards' ) );
+    postBuildBin( services.navigate( 'bin' ) );
+
+    if ( options.validators ) {
+        postBuildValidators( services.navigate( 'validators' ) );
     }
+
+    if ( options.views ) {
+        postBuildViews( services.navigate( 'views' ) );
+    }
+
+    postBuildConfigs( base.getPath(), options );
+    entry.readContent().then( content => (
+        entry.setPath( `${ src }/${ options.entry}.ts` ).write( content )
+    ) );
 };

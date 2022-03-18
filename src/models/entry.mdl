@@ -1,0 +1,5 @@
+import PostServer from 'postdam';
+
+const 
+    server = new PostServer();
+PostEnv.set( ':server', server );

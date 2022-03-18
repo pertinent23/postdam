@@ -10,14 +10,26 @@ export default class PostFile{
         this.setPath( path );
     }
 
-    protected setPath( val: string ) : void {
+    public setPath( val: string ) : PostFile {
         if ( !val )
             throw new Error( `( Postdam.PostFile ) path cannot be an empty string` );
-        this.path = val;
+                this.path = val;
+        return this;
     }
 
     public exist() : boolean {
         return fs.existsSync( this.path );
+    }
+ 
+    public write( data: string | Record<string, any> ) : Promise<void>{
+        return new Promise( ( resolve, reject ) => {
+            fs.writeFile( this.path, typeof data === 'string' ? data : JSON.stringify( data, null, 2 ), ( err ) => {
+                if ( err ) {
+                    return reject( err );
+                }
+                return resolve();
+            } );
+        } );
     }
 
     public readContent( encode: BufferEncoding  = 'utf8' ) : Promise<string> {

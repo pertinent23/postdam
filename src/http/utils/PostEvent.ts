@@ -1,9 +1,18 @@
 import { Application } from "express";
 
-export type PostEventDataType = number | string | object;
+export type PostEventDataType = number | string | object | boolean;
+
 export type PostNaturalEvent = {
     ( parent : Application ) : void
-}
+};
+
+export type PostListeningEvent = {
+    (): void
+};
+
+export type PostErrorEvent = {
+    ( err: Error ) : void 
+};
 
 export type PostEventData = {
     type: string,

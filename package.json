@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "postdam",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a javascript framwork to build node js server app",
   "main": "dist/index.js",
   "bin": {

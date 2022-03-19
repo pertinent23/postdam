@@ -1,4 +1,6 @@
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 export default class PostDir{
     protected path : string = '';
@@ -56,5 +58,11 @@ export default class PostDir{
 
     public static isValidAppName( name: string ) : boolean{
         return PostDir.APP_NAME_REG.test( name );
+    }
+
+    public static resolvePath( meta: string, link: string ) : string {
+        return path.join( path.dirname(
+            fileURLToPath(  meta ) 
+        ), link );
     }
 }

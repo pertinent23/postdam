@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --es-module-specifier-resolution=node --experimental-json-modules
 
 import PostServer from "./http/PostServer";
 import PostEnv from "./cli/PostEnv";

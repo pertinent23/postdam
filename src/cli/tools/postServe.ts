@@ -2,11 +2,7 @@ import shell from 'shelljs';
 import PostEnv from '../PostEnv';
 
 export function postServeApp( root: PostEnv ) : void {
-    root.getConfigFile().readContent().then( content => {
-        const 
-            data = JSON.parse( content );
-        shell.exec( `nodemon ${ root.getPath() }/src/${data.entry}.ts` );
-    } );
+    shell.exec( `nodemon --exec "npm start"` );
 };
 
 export function postBuildApp( root: PostEnv ) : void {
@@ -14,6 +10,6 @@ export function postBuildApp( root: PostEnv ) : void {
         const 
             data = JSON.parse( content ),
             params = '--es-module-specifier-resolution=node --experimental-json-modules';
-        shell.exec( `cd ${ root.getPath() } && tsc && node ${ params } ./dist/${data.entry}.ts` );
+        shell.exec( `tsc --project ${ root.getPath() } && node ${ params } ./dist/${data.options.entry}.js` );
     } );
 };

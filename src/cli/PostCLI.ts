@@ -5,7 +5,7 @@ import { postBuildApp, postServeApp } from './tools/postServe';
 import chalk from 'chalk';
 
 export const packages = {
-    version: '1.0.2'
+    version: '1.0.3'
 };
 
 export default class PostCLI{

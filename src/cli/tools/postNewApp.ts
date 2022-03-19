@@ -3,6 +3,7 @@ import path from 'path';
 import PostDir from '../../bin/PostDir';
 import PostFile from '../../bin/PostFile';
 import PostEnv from '../PostEnv';
+import PostModels from '../PostModels';
 import chalk from 'chalk';
 import ora from 'ora';
 
@@ -32,7 +33,7 @@ export function postInstallPackages( dirname: string, views: boolean ) : void {
     const 
         list = views ? postPackages.concat( postViewsPackages ) : postPackages,
         spinner = ora( `Installing ${ chalk.bgGreen.white( 'postman' ) } package` ).start();
-    shell.exec( `npm --prefix ${dirname} install ${ list.join( ' ' ) } --save`, { async: true }, ( code, output, error ) => {
+    shell.exec( `npm --prefix ${dirname} install ${ list.join( ' ' ) } --save`, { async: true, silent: true }, ( code, output, error ) => {
         spinner.stop();
         if ( code ) 
             return console.log( chalk.red( error ) );
@@ -162,7 +163,7 @@ export function postBuildFolders( base: PostDir, options: PostNewOptions ) : voi
     base.navigate( 'static' ).mkdir();
     let services;
     const 
-        entry = new PostFile( path.join( __dirname, './../../models/entry.mdl' ) ),
+        entry = new PostModels( 'entry' ),
         src =
             base
                 .navigate( 'src' ).mkdir();
@@ -181,7 +182,5 @@ export function postBuildFolders( base: PostDir, options: PostNewOptions ) : voi
     }
 
     postBuildConfigs( base.getPath(), options );
-    entry.readContent().then( content => (
-        entry.setPath( `${ src.getPath() }/${ options.entry }.ts` ).write( content )
-    ) );
+    entry.writeTo( `${ src.getPath() }/${ options.entry }.ts` );
 };

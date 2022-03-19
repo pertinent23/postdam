@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "postdam",
   "version": "1.0.2",
   "description": "a javascript framwork to build node js server app",
@@ -7,22 +8,21 @@
     "pm": "./dist/index.js"
   },
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && node --es-module-specifier-resolution=node --experimental-json-modules dist/index.js",
     "test": "nodemon src/index.ts",
     "clean": "rm -rf dist/",
     "build": "tsc && chmod +x dist/index.js",
     "deploy": "tsc && npm publish"
   },
-  "author": "Fr@nck Duval Heuba <10franckpertinent@gmail.com> https://github.com/pertinent23",
+  "author": "Fr@nck Duval Heuba <10franckpertinent@gmail.com> (https://github.com/pertinent23)",
   "license": "ISC",
   "devDependencies": {
     "@types/pug": "^2.0.6",
-    "@types/shelljs": "^0.8.11",
-    "typescript": "^4.6.2"
+    "@types/shelljs": "^0.8.11"
   },
   "dependencies": {
     "@types/express": "^4.17.13",
-    "chalk": "^5.0.1",
+    "chalk": "^4.1.2",
     "commander": "^9.0.0",
     "express": "^4.17.3",
     "handlebars": "^4.7.7",
@@ -33,6 +33,7 @@
     "pug": "^3.0.2",
     "rxjs": "^7.5.5",
     "shelljs": "^0.8.5",
-    "ts-node": "^10.7.0"
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
   }
 }

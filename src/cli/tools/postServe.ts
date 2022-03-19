@@ -12,7 +12,8 @@ export function postServeApp( root: PostEnv ) : void {
 export function postBuildApp( root: PostEnv ) : void {
     root.getConfigFile().readContent().then( content => {
         const 
-            data = JSON.parse( content );
-        shell.exec( `cd ${ root.getPath() } && tsc && node ./dist/${data.entry}.ts` );
+            data = JSON.parse( content ),
+            params = '--es-module-specifier-resolution=node --experimental-json-modules';
+        shell.exec( `cd ${ root.getPath() } && tsc && node ${ params } ./dist/${data.entry}.ts` );
     } );
 };

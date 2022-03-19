@@ -4,7 +4,9 @@ import postNewApp from './tools/postNewApp';
 import { postBuildApp, postServeApp } from './tools/postServe';
 import chalk from 'chalk';
 
-export const packages = require( './../../package.json' );
+export const packages = {
+    version: '1.0.2'
+};
 
 export default class PostCLI{
     protected app: Command = new Command();
@@ -79,7 +81,9 @@ export default class PostCLI{
     protected serverActions() : void  {
         if( this.env.getConfigFile().exist() ) {
             postServeApp( this.env );   
-        } else console.error( chalk.red( `(PostCLI) ${ process.cwd() } is not a postdam project, missing postdam.json file` ) );
+        } else console.error(
+            chalk.red( `(PostCLI) ${ process.cwd() } is not a postdam project, missing postdam.json file` )
+        );
     }
 
     protected getServeCommand( name: string = 'serve' ) : Command {
@@ -95,7 +99,9 @@ export default class PostCLI{
     protected buildActions() : void  {
         if( this.env.getConfigFile().exist() ) {
             postBuildApp( this.env );
-        } else console.error( chalk.red( `(PostCLI) ${ process.cwd() } is not a postdam project, missing postdam.json file` ) );
+        } else console.error( 
+            chalk.red( `(PostCLI) ${ process.cwd() } is not a postdam project, missing postdam.json file` ) 
+        );
     }
 
     protected getBuildCommand( name: string = 'build' ) : Command {

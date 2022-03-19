@@ -3,6 +3,8 @@ import path from 'path';
 import PostDir from '../../bin/PostDir';
 import PostFile from '../../bin/PostFile';
 import PostEnv from '../PostEnv';
+import chalk from 'chalk';
+import ora from 'ora';
 
 export type PostNewOptions = {
     views: boolean,
@@ -28,8 +30,14 @@ export function postCreateFolder( name: string ) : void {
 
 export function postInstallPackages( dirname: string, views: boolean ) : void {
     const 
-        list = views ? postPackages.concat( postViewsPackages ) : postPackages;
-    shell.exec( `npm --prefix ${dirname} install ${ list.join( ' ' ) } --save` );
+        list = views ? postPackages.concat( postViewsPackages ) : postPackages,
+        spinner = ora( `Installing ${ chalk.bgGreen.white( 'postman' ) } package` ).start();
+    shell.exec( `npm --prefix ${dirname} install ${ list.join( ' ' ) } --save`, { async: true }, ( code, output, error ) => {
+        spinner.stop();
+        if ( code ) 
+            return console.log( chalk.red( error ) );
+        return console.log( chalk.green( output ) );
+    } );
 };
 
 export default async function postNewApp( name: string = 'postdam', options: PostNewOptions ) {
@@ -89,8 +97,8 @@ export function postBuildConfigs( base: string, options: PostNewOptions ) : void
 
     typescriptJSON.write( {
         compilerOptions: {
-          target: "es2016", 
-          module: "commonjs",  
+          target: "ESNext", 
+          module: "ESNext",
           esModuleInterop: true,
           forceConsistentCasingInFileNames: true,
           strict: true,
@@ -107,6 +115,7 @@ export function postBuildConfigs( base: string, options: PostNewOptions ) : void
     } );
 
     packageJSON.write( {
+        type: 'module',
         name: options.name,
         version: "1.0.0",
         description: "getting started with postdam",
@@ -153,7 +162,7 @@ export function postBuildFolders( base: PostDir, options: PostNewOptions ) : voi
     base.navigate( 'static' ).mkdir();
     let services;
     const 
-        entry = new PostFile( './../../models/entry.mdl' ),
+        entry = new PostFile( path.join( __dirname, './../../models/entry.mdl' ) ),
         src =
             base
                 .navigate( 'src' ).mkdir();
@@ -173,6 +182,6 @@ export function postBuildFolders( base: PostDir, options: PostNewOptions ) : voi
 
     postBuildConfigs( base.getPath(), options );
     entry.readContent().then( content => (
-        entry.setPath( `${ src }/${ options.entry}.ts` ).write( content )
+        entry.setPath( `${ src.getPath() }/${ options.entry }.ts` ).write( content )
     ) );
 };
